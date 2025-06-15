@@ -38,28 +38,11 @@ Aplikasi web untuk memprediksi kondisi kesehatan mental menggunakan algoritma K-
    - Script ini akan membuat file `kmeans_model.pkl` dan `scaler.pkl`
 
 4. **Jalankan aplikasi**:
-   \`\`\`bash
-   python app.py
+   \`\`\`python predict.app --> python app.py
    \`\`\`
 
 5. **Akses aplikasi**:
    - Buka browser dan kunjungi `http://localhost:5000`
-
-## Struktur File
-
-\`\`\`
-├── app.py                 # Aplikasi Flask utama
-├── train_model.py         # Script untuk training model
-├── requirements.txt       # Dependencies Python
-├── templates/
-│   ├── index.html        # Halaman utama dengan form
-│   └── result.html       # Halaman hasil prediksi
-├── static/
-│   └── script.js         # JavaScript untuk interaksi dan visualisasi
-├── kmeans_model.pkl      # Model K-Means yang sudah dilatih
-├── scaler.pkl           # Scaler untuk normalisasi data
-└── dataCleaning.xlsx    # Data training (harus disediakan)
-\`\`\`
 
 ## API Endpoints
 
