@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prediksi Kesehatan Mental</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-gradient-to-b from-indigo-50 to-blue-100 min-h-screen flex items-center justify-center p-4 font-[Poppins]">
+    <div class="bg-white shadow-lg p-6 md:p-8 rounded-2xl w-full max-w-3xl border border-gray-100">
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold mb-3 text-gray-800 text-center">Prediksi Kesehatan Mental</h1>
+            <p class="text-gray-500 text-center text-sm">Isi kuesioner singkat berikut untuk mengetahui prediksi kesehatan mental Anda.</p>
+            <div class="h-1 w-20 bg-blue-500 mx-auto mt-4 rounded-full"></div>
+        </div>
+        
+        <form id="formKuesioner" class="space-y-5">
+            <div class="bg-gray-50 p-4 rounded-xl">
+                <label class="font-medium text-gray-700 block mb-2 text-sm">Berapa jam, rata-rata, Anda tidur setiap malam selama seminggu terakhir?</label>
+                <p class="text-xs text-gray-500 mb-3">Hitung mulai dari saat Anda mulai tidur sampai bangun keesokan paginya</p>
+                <input name="Waktu_Tidur" 
+                       type="number" 
+                       step="0.1"
+                       class="w-full px-4 py-3 rounded-lg border border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 text-base" 
+                       placeholder="Contoh: 7.5" required>
+            </div>
+            
+            <div class="bg-gray-50 p-4 rounded-xl">
+                <label class="font-medium text-gray-700 block mb-2 text-sm">Bagaimana Anda menilai kualitas tidur Anda selama seminggu terakhir?</label>
+                <p class="text-xs text-gray-500 mb-3">Kualitas tidur berarti seberapa nyenyak dan puas Anda dengan tidur Anda</p>
+                <input name="Kualitas_Tidur" 
+                       type="number" min="1" max="5" 
+                       class="w-full px-4 py-3 rounded-lg border border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 text-base" 
+                       placeholder="1 = sangat buruk, 5 = sangat baik" required>
+            </div>
+            
+            <div class="bg-gray-50 p-4 rounded-xl">
+                <label class="font-medium text-gray-700 block mb-2 text-sm">Seberapa sering Anda mengalami kesulitan untuk tidur atau sering terbangun malam hari?</label>
+                <p class="text-xs text-gray-500 mb-3">Kesulitan tidur: susah untuk memulai tidur, atau sering terbangun dan susah tidur lagi</p>
+                <input name="Kesulitan_Tidur" 
+                       type="number" min="1" max="5" 
+                       class="w-full px-4 py-3 rounded-lg border border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 text-base" 
+                       placeholder="1 = tidak pernah, 5 = setiap malam" required>
+            </div>
+            
+            <div class="bg-gray-50 p-4 rounded-xl">
+                <label class="font-medium text-gray-700 block mb-2 text-sm">Setelah bangun tidur, seberapa segar dan bugar tubuh Anda di pagi hari?</label>
+                <p class="text-xs text-gray-500 mb-3">Jika Anda sering masih mengantuk atau lelah saat bangun pagi, beri angka lebih rendah</p>
+                <input name="Kebugaran_Bangun" 
+                       type="number" min="1" max="5" 
+                       class="w-full px-4 py-3 rounded-lg border border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 text-base" 
+                       placeholder="1 = tidak segar, 5 = sangat segar" required>
+            </div>
+            
+            <div class="bg-gray-50 p-4 rounded-xl">
+                <label class="font-medium text-gray-700 block mb-2 text-sm">Berapa jam rata-rata Anda melakukan aktivitas fisik setiap hari?</label>
+                <p class="text-xs text-gray-500 mb-3">Aktivitas fisik seperti olahraga, berjalan kaki, bersepeda, atau kegiatan yang membuat tubuh aktif</p>
+                <input name="Akt_Fisik" 
+                       type="number" 
+                       step="0.1"
+                       class="w-full px-4 py-3 rounded-lg border border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 text-base" 
+                       placeholder="Contoh: 1.5" required>
+            </div>
+            
+            <div class="bg-gray-50 p-4 rounded-xl">
+                <label class="font-medium text-gray-700 block mb-2 text-sm">Berapa jam rata-rata Anda habiskan untuk kegiatan akademik setiap hari?</label>
+                <p class="text-xs text-gray-500 mb-3">Kegiatan akademik seperti kuliah, belajar, mengerjakan tugas, atau praktikum</p>
+                <input name="Akt_Akademik" 
+                       type="number" 
+                       step="0.1"
+                       class="w-full px-4 py-3 rounded-lg border border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 text-base" 
+                       placeholder="Contoh: 8" required>
+            </div>
+            
+            <div class="bg-gray-50 p-4 rounded-xl">
+                <label class="font-medium text-gray-700 block mb-2 text-sm">Berapa jam rata-rata Anda habiskan untuk kegiatan non-akademik setiap hari?</label>
+                <p class="text-xs text-gray-500 mb-3">Kegiatan seperti bermain, menonton hiburan, nongkrong, bersosialisasi, atau menjalankan hobi</p>
+                <input name="Akt_NonAkademik" 
+                       type="number" 
+                       step="0.1"
+                       class="w-full px-4 py-3 rounded-lg border border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 text-base" 
+                       placeholder="Contoh: 4" required>
+            </div>
+            
+            <div class="bg-gray-50 p-4 rounded-xl">
+                <label class="font-medium text-gray-700 block mb-2 text-sm">Seberapa sering Anda merasa lelah atau kehabisan energi setelah aktivitas harian?</label>
+                <p class="text-xs text-gray-500 mb-3">Lelah: Merasa tubuh capek, tidak bersemangat, atau ingin segera istirahat setelah aktivitas</p>
+                <input name="Rasa_Lelah" 
+                       type="number" min="1" max="5" 
+                       class="w-full px-4 py-3 rounded-lg border border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 text-base" 
+                       placeholder="1 = tidak pernah, 5 = sangat sering" required>
+            </div>
+            
+            <div class="bg-gray-50 p-4 rounded-xl">
+                <label class="font-medium text-gray-700 block mb-2 text-sm">Seberapa sering Anda merasa stres atau cemas berlebihan?</label>
+                <p class="text-xs text-gray-500 mb-3">Stres/cemas: Pikiran tidak tenang, mudah gelisah, merasa tertekan terkait tugas, hubungan sosial, atau masalah pribadi</p>
+                <input name="Rasa_Stress" 
+                       type="number" min="1" max="5" 
+                       class="w-full px-4 py-3 rounded-lg border border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 text-base" 
+                       placeholder="1 = tidak pernah, 5 = sangat sering" required>
+            </div>
+            
+            <div class="bg-gray-50 p-4 rounded-xl">
+                <label class="font-medium text-gray-700 block mb-2 text-sm">Seberapa sering Anda mengalami kesulitan untuk fokus atau berkonsentrasi?</label>
+                <p class="text-xs text-gray-500 mb-3">Kesulitan konsentrasi: Mudah teralihkan, tidak bisa fokus lama saat mengerjakan tugas atau aktivitas sehari-hari</p>
+                <input name="Sulit_Fokus" 
+                       type="number" min="1" max="5" 
+                       class="w-full px-4 py-3 rounded-lg border border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 text-base" 
+                       placeholder="1 = tidak pernah, 5 = sangat sering" required>
+            </div>
+            
+            <div class="bg-gray-50 p-4 rounded-xl">
+                <label class="font-medium text-gray-700 block mb-2 text-sm">Seberapa sering Anda merasa sedih, tidak bersemangat, atau kehilangan minat?</label>
+                <p class="text-xs text-gray-500 mb-3">Kehilangan minat: Aktivitas yang biasanya menyenangkan terasa membosankan atau berat dilakukan</p>
+                <input name="Hilang_Minat" 
+                       type="number" min="1" max="5" 
+                       class="w-full px-4 py-3 rounded-lg border border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 text-base" 
+                       placeholder="1 = tidak pernah, 5 = sangat sering" required>
+            </div>
+
+            <button type="submit" id="submitBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-xl mt-8 shadow-md w-full transition-colors">
+                <span id="submitText">Prediksi Kesehatan Mental</span>
+                <span id="loadingText" class="hidden">Memproses...</span>
+            </button>
+        </form>
+        
+        <div id="hasil" class="mt-8 text-center hidden">
+            <div id="hasilText" class="mb-6"></div>
+            <div class="flex flex-col items-center space-y-6">
+                <div class="w-full max-w-md">
+                    <canvas id="radarChart"></canvas>
+                </div>
+                <div class="w-full max-w-md">
+                    <canvas id="barChart"></canvas>
+                </div>
+                <div id="recommendations" class="w-full max-w-md bg-gray-50 p-4 rounded-xl"></div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

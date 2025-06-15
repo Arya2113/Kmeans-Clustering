@@ -1,0 +1,170 @@
+// <!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hasil Prediksi Kesehatan Mental</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-gradient-to-b from-indigo-50 to-blue-100 min-h-screen p-4 font-[Poppins]">
+    <div class="max-w-4xl mx-auto">
+        <div class="bg-white shadow-lg p-6 md:p-8 rounded-2xl border border-gray-100">
+            <div class="mb-8 text-center">
+                <h1 class="text-3xl font-bold mb-3 text-gray-800">Hasil Prediksi Kesehatan Mental</h1>
+                <div class="h-1 w-20 bg-blue-500 mx-auto rounded-full"></div>
+            </div>
+            
+            <!-- Hasil Klaster -->
+            <div class="text-center mb-8">
+                <div class="inline-block px-6 py-4 rounded-xl shadow-md {{ hasil.cluster_info.bg_class }} {{ hasil.cluster_info.text_class }} font-medium">
+                    <div class="text-xl font-bold mb-2">Klaster {{ hasil.cluster }}: {{ hasil.cluster_info.name }}</div>
+                    <div class="text-sm">{{ hasil.cluster_info.description }}</div>
+                </div>
+            </div>
+            
+            <!-- Visualisasi -->
+            <div class="grid md:grid-cols-2 gap-6 mb-8">
+                <div class="bg-gray-50 p-4 rounded-xl">
+                    <h3 class="text-lg font-semibold mb-4 text-center">Profil Kesehatan Mental</h3>
+                    <canvas id="radarChart"></canvas>
+                </div>
+                <div class="bg-gray-50 p-4 rounded-xl">
+                    <h3 class="text-lg font-semibold mb-4 text-center">Hasil Klasifikasi</h3>
+                    <canvas id="barChart"></canvas>
+                </div>
+            </div>
+            
+            <!-- Rekomendasi -->
+            <div class="bg-gray-50 p-6 rounded-xl mb-6">
+                <h3 class="text-lg font-semibold mb-4 text-gray-800">Rekomendasi untuk Anda:</h3>
+                <ul class="space-y-2">
+                    {% for rec in hasil.cluster_info.recommendations %}
+                    <li class="flex items-start">
+                        <span class="text-blue-500 mr-2">•</span>
+                        <span class="text-gray-700">{{ rec }}</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            
+            <!-- Data Input -->
+            <div class="bg-gray-50 p-6 rounded-xl mb-6">
+                <h3 class="text-lg font-semibold mb-4 text-gray-800">Data Input Anda:</h3>
+                <div class="grid md:grid-cols-2 gap-4 text-sm">
+                    <div>
+                        <p><strong>Waktu Tidur:</strong> {{ hasil.input.Waktu_Tidur }} jam</p>
+                        <p><strong>Kualitas Tidur:</strong> {{ hasil.input.Kualitas_Tidur }}/5</p>
+                        <p><strong>Kesulitan Tidur:</strong> {{ hasil.input.Kesulitan_Tidur }}/5</p>
+                        <p><strong>Kebugaran Bangun:</strong> {{ hasil.input.Kebugaran_Bangun }}/5</p>
+                        <p><strong>Aktivitas Fisik:</strong> {{ hasil.input.Akt_Fisik }} jam</p>
+                        <p><strong>Aktivitas Akademik:</strong> {{ hasil.input.Akt_Akademik }} jam</p>
+                    </div>
+                    <div>
+                        <p><strong>Aktivitas Non-Akademik:</strong> {{ hasil.input.Akt_NonAkademik }} jam</p>
+                        <p><strong>Rasa Lelah:</strong> {{ hasil.input.Rasa_Lelah }}/5</p>
+                        <p><strong>Rasa Stress:</strong> {{ hasil.input.Rasa_Stress }}/5</p>
+                        <p><strong>Sulit Fokus:</strong> {{ hasil.input.Sulit_Fokus }}/5</p>
+                        <p><strong>Hilang Minat:</strong> {{ hasil.input.Hilang_Minat }}/5</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Tombol Aksi -->
+            <div class="text-center space-x-4">
+                <a href="{{ url_for('index') }}" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-6 rounded-xl shadow-md transition-colors">
+                    Tes Lagi
+                </a>
+                <button onclick="window.print()" class="bg-gray-600 hover:bg-gray-700 text-white font-medium py-3 px-6 rounded-xl shadow-md transition-colors">
+                    Cetak Hasil
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Data untuk visualisasi dari server
+        const clusterData = {{ hasil.cluster }};
+        const featureImportance = {{ hasil.feature_importance | tojsonfilter }};
+        const clusterColor = '{{ hasil.cluster_info.color }}';
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            // Buat radar chart
+            const radarCtx = document.getElementById('radarChart').getContext('2d');
+            new Chart(radarCtx, {
+                type: 'radar',
+                data: {
+                    labels: Object.keys(featureImportance),
+                    datasets: [{
+                        label: 'Skor Area Kesehatan Mental',
+                        data: Object.values(featureImportance),
+                        backgroundColor: clusterColor.replace('rgb(', 'rgba(').replace(')', ', 0.2)'),
+                        borderColor: clusterColor,
+                        borderWidth: 2,
+                        pointBackgroundColor: clusterColor,
+                        pointRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    scales: {
+                        r: {
+                            angleLines: { display: true },
+                            suggestedMin: 0,
+                            suggestedMax: 100
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: (context) => `Skor: ${context.raw.toFixed(1)}/100`
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Buat bar chart
+            const barCtx = document.getElementById('barChart').getContext('2d');
+            const clusterColors = ['#22c55e', '#3b82f6', '#eab308', '#ef4444'];
+            const backgroundColor = clusterColors.map((color, index) => 
+                index === clusterData ? color : color + '80'
+            );
+            
+            new Chart(barCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Optimal', 'Baik', 'Perlu Perhatian', 'Risiko'],
+                    datasets: [{
+                        label: 'Klaster Anda',
+                        data: [
+                            clusterData === 0 ? 100 : 0,
+                            clusterData === 1 ? 100 : 0,
+                            clusterData === 2 ? 100 : 0,
+                            clusterData === 3 ? 100 : 0
+                        ],
+                        backgroundColor: backgroundColor,
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    scales: {
+                        x: { display: false, max: 100 },
+                        y: { grid: { display: false } }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { enabled: false }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>//
