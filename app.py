@@ -8,18 +8,30 @@ app.secret_key = 'mental_health_prediction_secret_key_2024'
 
 # Load model dan scaler
 try:
-    kmeans = joblib.load('kmeans_model.pkl')
-    scaler = joblib.load('scaler.pkl')
-    print("Model dan scaler berhasil dimuat!")
+    model_manual = joblib.load('kmeans_manual.pkl')
+    centroids = model_manual['centroids']
+    X_min = model_manual['X_min']
+    X_max = model_manual['X_max']
+    print("Model manual berhasil dimuat!")
 except FileNotFoundError as e:
     print(f"Error loading model: {e}")
-    print("Pastikan file kmeans_model.pkl dan scaler.pkl ada di direktori yang sama")
 
 fitur_prediksi = [
     'Waktu_Tidur', 'Kualitas_Tidur', 'Kesulitan_Tidur', 'Kebugaran_Bangun',
     'Akt_Fisik', 'Akt_Akademik', 'Akt_NonAkademik',
     'Rasa_Lelah', 'Rasa_Stress', 'Sulit_Fokus', 'Hilang_Minat'
 ]
+
+def minmax_scale_input(arr, X_min, X_max):
+    return (arr - X_min) / (X_max - X_min)
+
+def euclidean_distance(a, b):
+    return np.sqrt(np.sum((a - b) ** 2))
+
+def assign_cluster_manual(arr_scaled, centroids):
+    distances = [euclidean_distance(arr_scaled[0], c) for c in centroids]
+    return int(np.argmin(distances))
+
 
 # Definisi karakteristik klaster
 cluster_info = {
@@ -85,35 +97,33 @@ def predict():
         else:
             data = {f: request.form[f] for f in fitur_prediksi}
         
-        # Konversi ke array numpy
         arr = np.array([float(data[f]) for f in fitur_prediksi]).reshape(1, -1)
-        arr_scaled = scaler.transform(arr)
-        label = int(kmeans.predict(arr_scaled)[0])
-        
-        # Hitung feature importance untuk visualisasi
+        arr_scaled = minmax_scale_input(arr, X_min, X_max)
+        label = assign_cluster_manual(arr_scaled, centroids)
+
         feature_importance = calculate_feature_importance(data)
         
-        # Simpan hasil ke session untuk HTML requests
         session['hasil'] = {
             'input': data,
             'cluster': label,
             'cluster_info': cluster_info[label],
             'feature_importance': feature_importance
         }
-        
+
         if request.is_json:
             return jsonify({
                 "cluster": label,
                 "cluster_info": cluster_info[label],
                 "feature_importance": feature_importance
             })
-        
+
         return redirect(url_for('result'))
     except Exception as e:
         print('Predict error:', str(e))
         if request.is_json:
             return jsonify({"error": str(e)}), 400
         return f"Error: {str(e)}", 400
+
 
 @app.route('/result')
 def result():
@@ -128,15 +138,20 @@ def calculate_feature_importance(data):
         'Pola Tidur': (float(data['Waktu_Tidur']) * 0.4 + 
                       float(data['Kualitas_Tidur']) * 0.4 + 
                       (6 - float(data['Kesulitan_Tidur'])) * 0.2) * 20,
-        'Aktivitas Fisik': float(data['Akt_Fisik']) * 20,
-        'Keseimbangan Aktivitas': (1 - abs(float(data['Akt_Akademik']) - 
-                                          float(data['Akt_NonAkademik'])) / 10) * 100,
+
+        'Aktivitas Fisik & Keseimbangan': (
+            (float(data['Akt_Fisik']) * 0.5 * 20) + 
+            ((1 - abs(float(data['Akt_Akademik']) - float(data['Akt_NonAkademik'])) / 10) * 100 * 0.5)
+        ),
+
         'Energi & Vitalitas': ((6 - float(data['Rasa_Lelah'])) * 0.5 + 
                               float(data['Kebugaran_Bangun']) * 0.5) * 20,
+
         'Kesehatan Emosional': ((6 - float(data['Rasa_Stress'])) * 0.4 + 
                                (6 - float(data['Sulit_Fokus'])) * 0.3 + 
                                (6 - float(data['Hilang_Minat'])) * 0.3) * 20
     }
+
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
