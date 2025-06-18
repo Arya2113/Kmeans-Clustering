@@ -30,11 +30,9 @@ def update_centroids(X, labels, k):
 def kmeans_plus_plus_init(X, k):
     np.random.seed(42)
     centroids = []
-    # Ambil 1 centroid pertama secara acak
     centroids.append(X[np.random.choice(X.shape[0])])
     
     for _ in range(1, k):
-        # Hitung jarak kuadrat ke centroid terdekat
         dists = np.array([min([euclidean_distance(x, c)**2 for c in centroids]) for x in X])
         probas = dists / dists.sum()
         next_centroid_idx = np.random.choice(X.shape[0], p=probas)
@@ -42,10 +40,7 @@ def kmeans_plus_plus_init(X, k):
     
     return np.array(centroids)
 
-# Baca data
 df = pd.read_excel('dataCleaning.xlsx')
-
-# Fitur yang digunakan
 fitur = [
     'Waktu_Tidur', 'Kualitas_Tidur', 'Kesulitan_Tidur', 'Kebugaran_Bangun',
     'Akt_Fisik', 'Akt_Akademik', 'Akt_NonAkademik',
@@ -54,19 +49,16 @@ fitur = [
 X = df[fitur].values
 X_scaled, X_min, X_max = minmax_scale(X)
 
-# Inisialisasi centroid awal dengan K-Means++
 k = 4
 centroids = X_scaled[[0, 1, 2, 3]]  # C1 dari data ke-1, C2 dari ke-2, dst
 centroids_iter1 = centroids.copy()
 
-# ITERASI 1 — hasil awal
 labels_iter1 = assign_clusters(X_scaled, centroids_iter1)
 dist_iter1 = [[euclidean_distance(x, c) for c in centroids_iter1] for x in X_scaled]
 df_iter1 = df.copy()
 df_iter1[['C1', 'C2', 'C3', 'C4']] = pd.DataFrame(dist_iter1, index=df.index)
 df_iter1['Cluster'] = labels_iter1
 
-# ITERASI LANJUTAN — hingga konvergen
 max_iter = 10
 centroids_final = centroids_iter1.copy()
 for i in range(max_iter):
@@ -76,7 +68,6 @@ for i in range(max_iter):
         break
     centroids_final = new_centroids
 
-# HASIL AKHIR — hasil konvergen
 labels_final = assign_clusters(X_scaled, centroids_final)
 dist_final = [[euclidean_distance(x, c) for c in centroids_final] for x in X_scaled]
 df_final = df.copy()
@@ -87,10 +78,8 @@ df_final['Cluster'] = labels_final
 cluster_means = df_final.groupby('Cluster')[fitur].mean()
 cluster_means.index = ['C1', 'C2', 'C3', 'C4']
 
-# Simpan model
-joblib.dump({'centroids': centroids_final, 'X_min': X_min, 'X_max': X_max}, 'kmeans_manual.pkl')
 
-# SIMPAN EXCEL
+joblib.dump({'centroids': centroids_final, 'X_min': X_min, 'X_max': X_max}, 'kmeans_manual.pkl')
 with pd.ExcelWriter('hasil_clustering_manual.xlsx') as writer:
     df_iter1.to_excel(writer, sheet_name='Data Cluster', index=False)
     df_final.to_excel(writer, sheet_name='Data Cluster Konvergen', index=False)

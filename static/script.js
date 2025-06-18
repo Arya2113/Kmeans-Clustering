@@ -63,45 +63,62 @@ document.addEventListener("DOMContentLoaded", () => {
   })
 
   function displayResult(result) {
-    const cluster = result.cluster
-    const clusterInfo = result.cluster_info
-    const featureImportance = result.feature_importance
-    
+  const cluster = result.cluster
+  const clusterInfo = result.cluster_info
+  const featureImportance = result.feature_importance
 
-    // Display text result
-    hasilText.innerHTML = `
-            <div class="inline-block px-6 py-4 rounded-xl shadow-md ${clusterInfo.bg_class} ${clusterInfo.text_class} font-medium">
-                <div class="text-xl font-bold mb-2">Klaster ${cluster}: ${clusterInfo.name}</div>
-                <div class="text-sm">${clusterInfo.description}</div>
-            </div>
-        `
+  // Display text result
+  hasilText.innerHTML = `
+      <div class="inline-block px-6 py-4 rounded-xl shadow-md ${clusterInfo.bg_class} ${clusterInfo.text_class} font-medium">
+          <div class="text-xl font-bold mb-2">Klaster ${cluster}: ${clusterInfo.name}</div>
+          <div class="text-sm">${clusterInfo.description}</div>
+      </div>
+  `
 
-    // Create visualizations
-    createRadarChart(featureImportance, clusterInfo.color)
-    createBarChart(cluster, clusterInfo.color)
+  // Create visualizations
+  createRadarChart(featureImportance, clusterInfo.color)
+  createBarChart(cluster, clusterInfo.color)
 
-    // Display recommendations
-    const recommendationsDiv = document.getElementById("recommendations")
-    recommendationsDiv.innerHTML = `
-            <h3 class="text-lg font-semibold mb-4 text-gray-800">Rekomendasi untuk Anda:</h3>
-            <ul class="space-y-2">
-                ${clusterInfo.recommendations
-                  .map(
-                    (rec) => `
-                    <li class="flex items-start">
-                        <span class="text-blue-500 mr-2">•</span>
-                        <span class="text-gray-700">${rec}</span>
-                    </li>
-                `,
-                  )
-                  .join("")}
-            </ul>
-        `
+  // Display recommendations
+  const recommendationsDiv = document.getElementById("recommendations")
+  recommendationsDiv.innerHTML = `
+      <h3 class="text-lg font-semibold mb-4 text-gray-800">Rekomendasi untuk Anda:</h3>
+      <ul class="space-y-2">
+          ${clusterInfo.recommendations
+            .map(
+              (rec) => `
+              <li class="flex items-start">
+                  <span class="text-blue-500 mr-2">•</span>
+                  <span class="text-gray-700">${rec}</span>
+              </li>
+          `
+            )
+            .join("")}
+      </ul>
+  `
 
-    // Show results
-    hasilDiv.classList.remove("hidden")
-    hasilDiv.scrollIntoView({ behavior: "smooth" })
-  }
+  // Show results
+  hasilDiv.classList.remove("hidden")
+  hasilDiv.scrollIntoView({ behavior: "smooth" })
+
+  // ➕ Tampilkan tombol reset
+  const resetBtn = document.getElementById("resetBtn")
+  resetBtn.classList.remove("hidden")
+  resetBtn.addEventListener("click", () => {
+    form.reset()
+
+    hasilDiv.classList.add("hidden")
+    hasilText.innerHTML = ""
+    recommendationsDiv.innerHTML = ""
+
+    if (radarChart) radarChart.destroy()
+    if (barChart) barChart.destroy()
+
+    resetBtn.classList.add("hidden")
+    window.scrollTo({ top: 0, behavior: "smooth" })
+  })
+}
+
 
   function createRadarChart(featureImportance, color) {
     const ctx = document.getElementById("radarChart").getContext("2d")

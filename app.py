@@ -132,6 +132,11 @@ def result():
         return redirect(url_for('index'))
     return render_template('result.html', hasil=hasil)
 
+@app.route('/reset', methods=['POST'])
+def reset():
+    session.pop('hasil', None)
+    return redirect(url_for('index'))
+
 def calculate_feature_importance(data):
     """Hitung feature importance untuk visualisasi"""
     return {
